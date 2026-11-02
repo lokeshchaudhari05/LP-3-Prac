@@ -1,0 +1,48 @@
+# ---- Cell 1: Import libraries ----
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
+
+# ---- Cell 2: Load dataset ----
+df = pd.read_csv('emails.csv')
+print(df.shape)
+
+# ---- Cell 3: Pre-process (0 = Not Spam, 1 = Spam) ----
+print(df.isnull().sum().sum())
+X = df.drop(['Email No.', 'Prediction'], axis=1)
+y = df['Prediction']
+
+# keep the 500 most common words so the models run fast
+top_words = X.sum().sort_values(ascending=False).head(500).index
+X = X[top_words]
+
+# ---- Cell 4: Split data ----
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# ---- Cell 5: K-Nearest Neighbors ----
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+knn_pred = knn.predict(X_test)
+
+# ---- Cell 6: Support Vector Machine ----
+svm = SVC(kernel='linear')
+svm.fit(X_train, y_train)
+svm_pred = svm.predict(X_test)
+
+# ---- Cell 7: Analyze performance ----
+print('KNN Confusion Matrix')
+print(confusion_matrix(y_test, knn_pred))
+print('SVM Confusion Matrix')
+print(confusion_matrix(y_test, svm_pred))
+
+results = pd.DataFrame({
+    'Model': ['KNN', 'SVM'],
+    'Accuracy': [accuracy_score(y_test, knn_pred), accuracy_score(y_test, svm_pred)],
+    'Precision': [precision_score(y_test, knn_pred), precision_score(y_test, svm_pred)],
+    'Recall': [recall_score(y_test, knn_pred), recall_score(y_test, svm_pred)]
+})
+print(results)

@@ -1,0 +1,37 @@
+# Practical 2: Job sequencing with deadlines (greedy)
+
+def job_sequencing(jobs):
+    # jobs: list of (job_id, deadline, profit)
+    jobs = sorted(jobs, key=lambda x: x[2], reverse=True)   # highest profit first
+    max_d = max(j[1] for j in jobs)
+    slot = [None] * (max_d + 1)                              # slot[1..max_d]
+    total = 0
+    for jid, d, p in jobs:
+        for t in range(min(d, max_d), 0, -1):                # latest free slot <= deadline
+            if slot[t] is None:
+                slot[t] = jid
+                total += p
+                break
+    return slot[1:], total
+
+if __name__ == "__main__":
+    jobs = [('J1', 2, 100), ('J2', 1, 19), ('J3', 2, 27), ('J4', 1, 25), ('J5', 3, 15)]
+    print("Jobs (id, deadline, profit):", jobs)
+    seq, profit = job_sequencing(jobs)
+    print("Job sequence :", seq)
+    print("Total profit :", profit)
+
+
+
+
+
+"""
+Job sequencing with deadlines
+Aim: get maximum profit by scheduling jobs, each taking 1 unit of time.
+Problem: a job earns its profit only if it finishes by its deadline, and one job runs per slot.
+Method: greedy. Sort by profit in descending order, then put each job in the latest free slot on or before its deadline. Skip it if none is free.
+Data: J1 (2, 100), J2 (1, 19), J3 (2, 27), J4 (1, 25), J5 (3, 15).
+Working: J1 goes to slot 2, J3 to slot 1, J5 to slot 3, and J4 and J2 are rejected.
+Complexity: O(n²) in the worst case, or O(n log n) with union-find.
+Output: sequence J3, J1, J5 with profit 142.
+"""

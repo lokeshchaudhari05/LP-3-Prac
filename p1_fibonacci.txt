@@ -1,0 +1,55 @@
+
+def fib_iterative(n):
+    steps = 0
+    a, b = 0, 1
+    for _ in range(n):
+        a, b = b, a + b
+        steps += 1              # one step per loop iteration
+    return a, steps
+
+rec_steps = 0
+def fib_recursive(n):
+    global rec_steps
+    rec_steps += 1              # one step per function call
+    if n < 2:
+        return n
+    return fib_recursive(n - 1) + fib_recursive(n - 2)
+
+def fib_memo(n, memo=None, counter=None):
+    if memo is None: memo = {}
+    if counter is None: counter = [0]
+    counter[0] += 1
+    if n < 2:
+        return n, counter[0]
+    if n not in memo:
+        memo[n] = fib_memo(n - 1, memo, counter)[0] + fib_memo(n - 2, memo, counter)[0]
+    return memo[n], counter[0]
+
+if __name__ == "__main__":
+    n = 10
+    val, s = fib_iterative(n)
+    print(f"Iterative : F({n}) = {val}, steps = {s}")
+    rec_steps = 0
+    val = fib_recursive(n)
+    print(f"Recursive : F({n}) = {val}, steps (calls) = {rec_steps}")
+    val, s = fib_memo(n)
+    print(f"Memoized  : F({n}) = {val}, steps (calls) = {s}")
+    print("Series:", [fib_iterative(i)[0] for i in range(n + 1)])
+
+
+
+
+
+
+
+
+'''
+ Fibonacci with step count
+Aim: find F(n) and compare the steps taken by different methods.
+Problem: each number is the sum of the previous two (0, 1, 1, 2, 3, 5, …). Find F(10).
+Method: iterative loop, plain recursion, and memoization (a dictionary to store results).
+Steps: iterative takes n steps. Recursive takes 2·F(n+1) − 1 calls. Memoized takes about 2n calls.
+Complexity: iterative is O(n) time and O(1) space. Recursive is O(2ⁿ) time and O(n) stack space. Memoized is O(n).
+Why: recursion recomputes the same subproblems, and memoization stores them.
+Output: F(10) = 55. Iterative has 10 steps, recursive 177 calls, memoized 19 calls.
+'''

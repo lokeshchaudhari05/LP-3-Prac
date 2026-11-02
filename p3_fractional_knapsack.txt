@@ -1,0 +1,51 @@
+# Practical 3: Fractional knapsack (greedy by value/weight ratio)
+
+def fractional_knapsack(items, capacity):
+    # items: list of (name, value, weight)
+    items = sorted(items, key=lambda x: x[1] / x[2], reverse=True)
+    total, remaining, taken = 0.0, capacity, []
+    for name, v, w in items:
+        if remaining == 0:
+            break
+        if w <= remaining:
+            taken.append((name, 1.0))
+            total += v
+            remaining -= w
+        else:
+            frac = remaining / w
+            taken.append((name, round(frac, 4)))
+            total += v * frac
+            remaining = 0
+    return total, taken
+
+if __name__ == "__main__":
+    items = [('A', 60, 10), ('B', 100, 20), ('C', 120, 30)]
+    cap = 50
+    print("Items (name, value, weight):", items, "| Capacity:", cap)
+    total, taken = fractional_knapsack(items, cap)
+    print("Fraction taken:", taken)
+    print("Maximum value :", round(total, 2))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+Fractional knapsack
+Aim: maximum value in a bag of capacity 50, where items can be split.
+Problem: A (60, 10), B (100, 20), C (120, 30), listed as (value, weight).
+Method: greedy. Sort by value/weight in descending order (6, 5, 4). Take whole items, and take a fraction of the last one.
+Working: A and B fit fully, giving 160 with 20 capacity left. Then take 20/30 of C, which gives 80.
+Complexity: O(n log n) because of sorting.
+Why optimal: fractions are allowed, so the best ratio first is always right.
+Output: maximum value 240, with C taken as 0.6667.
+"""
